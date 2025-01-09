@@ -1,0 +1,124 @@
+:root {
+    --panel_border: #c3c3c3;
+    --bg_extra_light: #004e55;
+    --bg_light: #004046;
+    --bg_medium: #00383D;
+    --bg_dark: #003034;
+}
+
+body {
+    width: 100%;
+    position: absolute;
+    margin: 0px 0px 0px 0px;
+    background-color: var(--bg_light);
+    font-family: "Montserrat", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    color: #ececec;
+    font-size: large;
+    display: flex;
+    flex-direction: column;
+}
+
+.summary {
+    margin-top: 10px;
+}
+
+.title_bar {
+    background-color: var(--bg_dark);
+    margin-bottom: 25px;
+    padding: 0px 25px 0px 25px;
+    border-bottom: var(--panel_border) solid 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.report_select {
+    align-self: center;
+}
+
+@media (max-width: 800px) {
+    .title_bar {
+        flex-direction: column;
+        padding-bottom: 10px;
+    }
+
+    .report_select {
+        align-self: flex-start;
+    }
+}
+
+#main_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    background-color: var(--bg_medium);
+    border-radius: 15px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    width: calc(100% - 50px);
+}
+
+.content_panel {
+    background-color: var(--bg_dark);
+    border: var(--panel_border) solid 5px;
+    border-radius: 10px;
+    margin: 15px auto 0px auto;
+    width: calc(100% - 25px);
+    box-sizing: border-box;
+    padding: 10px 10px 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+    
+.content_panel:last-child {
+    margin-bottom: 15px;
+}
+
+#info {
+    text-align: center;
+}
+
+.package_title {
+    margin: 0px;
+}
+
+.regression_list {
+    background-color: var(--bg_extra_light);
+    border-radius: 10px;
+    padding: 10px;
+    display: block;
+    margin-top: 15px;
+}
+
+.regression_list>div {
+    max-width: 100%; /* Adjust the width constraint to fit your layout */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.regression_type_title {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.result_passed {
+    color: greenyellow;
+}
+
+.result_failed {
+    color: red;
+}
+
+.result_test_error {
+    color: coral;
+}
+
+.result_not_found {
+    color: magenta;
+}

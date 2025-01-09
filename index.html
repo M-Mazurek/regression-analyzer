@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Regression Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="title_bar">
+        <h3>Regression Analyzer</h3>
+        <div class="report_select">
+            <label for="report_list">Choose the report:</label>
+            <span style="display: inline-block;">
+            <input type="date" id="report_date" name="report_date">
+            <button id="report_submit">Get Results</button> 
+            </span>
+        </div>
+    </div>
+    <div id="main_container">
+        <div class="content_panel" id="info">
+            <a>Select the date of the test run and the test result comparison with the previous one will be displayed here! </a>
+        </div>
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>
