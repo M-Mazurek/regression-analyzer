@@ -1,4 +1,4 @@
-const siteUrl = 'Origin: https://github.com/M-Mazurek/regression-analyzer';
+const siteUrl = 'https://m-mazurek.github.io/regression-analyzer';
 const reportDateLookback = 30;
 
 const mainContainer = document.getElementById('main_container');
