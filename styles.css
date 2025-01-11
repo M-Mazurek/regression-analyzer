@@ -8,6 +8,7 @@
 
 body {
     width: 100%;
+    min-height: 100vh;
     position: absolute;
     margin: 0px 0px 0px 0px;
     background-color: var(--bg_light);
@@ -35,6 +36,14 @@ body {
     justify-content: space-between;
 }
 
+footer {
+    background-color: var(--bg_dark);
+    border-top: var(--panel_border) solid 5px;
+    margin-top: 25px;
+    color: slategray;
+    padding-left: 25px;
+}
+
 .report_select {
     align-self: center;
 }
@@ -60,6 +69,7 @@ body {
     margin: 0 auto;
     box-sizing: border-box;
     width: calc(100% - 50px);
+    flex: 1;
 }
 
 .content_panel {

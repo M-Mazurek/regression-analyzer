@@ -6,7 +6,25 @@ const reportDate = document.getElementById('report_date');
 const reportSubmit = document.getElementById('report_submit');
 const info = document.getElementById('info');
 
+const regressionTypes = {
+    Progression: [ "1 0", "2 0", "undefined 0" ],
+    Regression: [ "0 1", "0 2", "undefined 1", "undefined 2" ],
+    Constant: [ "0 0", "1 1", "2 2", "1 2", "2 1" ]
+};
+
 let testNameDict = [];
+
+function subtractDays(date, days) {
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() - days,
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
+        date.getMilliseconds()
+    );
+}
 
 function getResultNameFromCode(code)
 {
@@ -26,6 +44,20 @@ function getResultTitleSpan(code) {
     return resSpan;
 }
 
+function createRegressionTypePanel(name, outerPanel)
+{
+    let panel = document.createElement('div');
+    panel.className = 'regression_list';
+    let title = document.createElement('div');
+    title.className = 'regression_type_title';
+    title.textContent = name;
+
+    outerPanel.appendChild(panel);
+    panel.appendChild(title);
+
+    return panel;
+}
+
 function addRegressionStatusForPackage(currentResults, previousResults, panel) {
     let resDict = [];
     Object.keys(currentResults).forEach(testId => {
@@ -39,28 +71,35 @@ function addRegressionStatusForPackage(currentResults, previousResults, panel) {
 
     resDict.sort();
 
-    Object.keys(resDict).forEach(regressionType => {
-        let innerPanel = document.createElement('div');
-        innerPanel.className = 'regression_list';
+    let progressionPanel = createRegressionTypePanel('Progression', panel);
+    let regressionPanel = createRegressionTypePanel('Regression', panel);
+    let constantPanel = createRegressionTypePanel('Constant', panel);
+
+    Object.keys(resDict).forEach(regressionPair => {
         let title = document.createElement('div');
         title.className = 'regression_type_title';
 
-        let resCodes = regressionType.split(' ');
-
-        panel.appendChild(innerPanel);
-        innerPanel.appendChild(title);
+        let resCodes = regressionPair.split(' ');
 
         title.appendChild(getResultTitleSpan(resCodes[0]));
         title.innerHTML += " -> ";
         title.appendChild(getResultTitleSpan(resCodes[1]));
 
-        resDict[regressionType].forEach(testId => {
+        let panelToFill = regressionTypes.Progression.includes(regressionPair) ?
+            progressionPanel : regressionTypes.Regression.includes(regressionPair) ?
+            regressionPanel : constantPanel;
+
+        panelToFill.appendChild(title);
+
+        resDict[regressionPair].forEach(testId => {
             let row = document.createElement('div');
             // uproszczenie na potrzeby prezentacji
             let name = testNameDict[testId];
             row.innerHTML = `- ${name == undefined ? testId : name} <a href="log">Previous Log</a> <a href="log">Current Log</a>`;
-            innerPanel.appendChild(row);
+            panelToFill.appendChild(row);
         });
+
+        panelToFill.appendChild(document.createElement('br'));
     });
 }
 
@@ -112,7 +151,14 @@ function addSummary(results) {
         let summary = document.createElement('div');
         summary.className = 'summary';
         let passratePrc = Math.floor(resultCodeCounts["0"] / testCount * 100);
-        summary.innerHTML = `${package}: Passrate: ${passratePrc}% (${resultCodeCounts["0"]}/${testCount})`;
+        summary.innerHTML = `${package}: Passrate: `;
+
+        let passrateSpan = document.createElement('span');
+        passrateSpan.textContent = `${passratePrc}% (${resultCodeCounts["0"]}/${testCount})`;
+        passrateSpan.className = passratePrc >= 80 ? 
+            'result_passed' : passratePrc >= 60 ?
+            'result_test_error' : 'result_failed';
+        summary.appendChild(passrateSpan);
 
         Object.keys(resultCodeCounts).forEach(code => {
             summary.appendChild(document.createElement("br"));
@@ -125,13 +171,16 @@ function addSummary(results) {
 }
 
 async function tryLoadResults() {
+    info.textContent = "Fetching results...";
+    reportSubmit.disabled = true;
+
     let currentJson, previousJson;
     let initialDate = new Date(reportDate.value);
     let queriedDate = new Date(reportDate.value);
 
     let i;
     for (i = 0; i <= reportDateLookback; i++) {
-        queriedDate.setDate(initialDate.getDate() - i);
+        queriedDate = subtractDays(initialDate, i);
         currentJson = await tryGetReport(queriedDate);
 
         if (currentJson != undefined)
@@ -141,8 +190,8 @@ async function tryLoadResults() {
     let previousDate = new Date(queriedDate);
     
     let _i;
-    for (_i = 0; _i <= reportDateLookback; _i++) {
-        previousDate.setDate(previousDate.getDate() - 1);
+    for (_i = 1; _i <= reportDateLookback; _i++) {
+        previousDate = subtractDays(queriedDate, _i);
         previousJson = await tryGetReport(previousDate);
 
         if (previousJson != undefined)
@@ -155,11 +204,13 @@ async function tryLoadResults() {
 
     if (currentJson == undefined) {
         info.textContent = `No run was found on ${initialDate.toISOString().split('T')[0]} or ${reportDateLookback} days prior.`;
+        reportSubmit.disabled = false;
         return;
     }
     
     if (previousJson == undefined) {
         info.textContent = `Run was found ${i} days prior to ${initialDate.toISOString().split('T')[0]} (${queriedDate.toISOString().split('T')[0]}), but no other one ${reportDateLookback} days prior. Cannot generate a comparison.`;
+        reportSubmit.disabled = false;
         return;
     }
 
@@ -173,6 +224,7 @@ async function tryLoadResults() {
     info.textContent += ` Comparing to ${previousDate.toISOString().split('T')[0]}:`;
     addSummary(currentJson);
     addPackagePanels(currentJson, previousJson);
+    reportSubmit.disabled = false;
 }
 
 function getTestNames() {
